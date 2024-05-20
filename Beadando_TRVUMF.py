@@ -3,79 +3,79 @@ from datetime import datetime
 
 # Absztrakt szoba osztály
 class Szoba(ABC):
-    def __init__(self, price, room_number):
-        self.price = price
-        self.room_number = room_number
+    def __init__(self, ar, szoba_szam):
+        self.ar = ar
+        self.szoba_szam = szoba_szam
 
     @abstractmethod
-    def room_type(self):
+    def szoba_type(self):
         pass
 
 # Egyágyas szoba osztály
 class Egyagyas(Szoba):
-    def __init__(self, price, room_number):
-        super().__init__(price, room_number)
+    def __init__(self, ar, szoba_szam):
+        super().__init__(ar, szoba_szam)
 
-    def room_type(self):
+    def szoba_type(self):
         return "Egyágyas"
 
 # Kétágyas szoba osztály
 class Ketagyas(Szoba):
-    def __init__(self, price, room_number):
-        super().__init__(price, room_number)
+    def __init__(self, ar, szoba_szam):
+        super().__init__(ar, szoba_szam)
 
-    def room_type(self):
+    def szoba_type(self):
         return "Kétágyas"
 
 # Hotel osztály
 class Hotel:
-    def __init__(self, name):
-        self.name = name
-        self.rooms = []
+    def __init__(self, nev):
+        self.nev = nev
+        self.szobak = []
 
-    def add_room(self, room):
-        self.rooms.append(room)
+    def add_szoba(self, szoba):
+        self.szobak.append(szoba)
 
 # Foglalás osztály
 class Foglalas:
     def __init__(self):
-        self.bookings = {}
+        self.foglalasok = {}
 
-    def book_room(self, room, date):
-        if date in self.bookings and room in self.bookings[date]:
-            return f"A {room.room_number} számú szoba már foglalt ebben az időpontban: {date}"
-        if date not in self.bookings:
-            self.bookings[date] = []
-        self.bookings[date].append(room)
-        return f"A {room.room_number} számú szoba le lett foglalva a következő időpontra: {date}"
+    def szoba_foglalas(self, szoba, datum):
+        if datum in self.foglalasok and szoba in self.foglalasok[datum]:
+            return f"A {szoba.szoba_szam} számú szoba már foglalt ebben az időpontban: {datum}"
+        if datum not in self.foglalasok:
+            self.foglalasok[datum] = []
+        self.foglalasok[datum].append(szoba)
+        return f"A {szoba.szoba_szam} számú szoba le lett foglalva a következő időpontra: {datum}"
 
-    def cancel_booking(self, room, date):
-        if date in self.bookings and room in self.bookings[date]:
-            self.bookings[date].remove(room)
-            return f"A foglalás {room.room_number} számú szobára, {date} időpontra törölve lett."
+    def szoba_torles(self, szoba, datum):
+        if datum in self.foglalasok and szoba in self.foglalasok[datum]:
+            self.foglalasok[datum].remove(szoba)
+            return f"A foglalás {szoba.szoba_szam} számú szobára, {datum} időpontra törölve lett."
         return "A foglalás nem található."
 
-    def list_bookings(self):
-        return self.bookings
+    def lista_foglalasok(self):
+        return self.foglalasok
 
 # Ebben a részben történik az egyágyas, illetve a kétágyas szobák létrehozása
 def szoba_generalas(hotel):
-    # Add single rooms
+    # Egyágyas szobák hozzáadása
     for i in range(1, 11):  # 10 darab egyágyas szobát készít
-        room = Egyagyas(100, 100 + i)
-        hotel.add_room(room)
+        szoba = Egyagyas(100, 100 + i)
+        hotel.add_szoba(szoba)
 
-    # Add double rooms
+    # Kétágyas szobák hozzáadása
     for i in range(1, 11):  # 10 darab kétágyas szobát készít
-        room = Ketagyas(200, 200 + i)
-        hotel.add_room(room)
+        szoba = Ketagyas(200, 200 + i)
+        hotel.add_szoba(szoba)
 
-    print(f"Összesen {len(hotel.rooms)} lett generálva.")
+    print(f"Összesen {len(hotel.szobak)} lett generálva.")
 
 # Felhasználói felület
 def user_interface():
     hotel = Hotel("Grand Budapest")
-    booking_system = Foglalas()
+    foglalas_rendszer = Foglalas()
 
     # Szobák létrehozása
     szoba_generalas(hotel)
@@ -86,42 +86,42 @@ def user_interface():
         print("3. Az összes szoba listázása")
         print("4. Foglalások listázása")
         print("5. Kilépés")
-        choice = int(input("Válasszon egyet a fenti lehetőségek közül: "))
+        m = int(input("Válasszon egyet a fenti lehetőségek közül: "))
 
-        if choice == 1:
-            room_number = int(input("Írja a be a szoba sorszámát: "))
-            date = input("Írja be a foglalás időpontját (YYYY-MM-DD): ")
-            date = datetime.strptime(date, "%Y-%m-%d").date()
+        if m == 1:
+            szoba_szam = int(input("Írja a be a szoba sorszámát: "))
+            datum = input("Írja be a foglalás időpontját (YYYY-MM-DD): ")
+            datum = datetime.strptime(datum, "%Y-%m-%d").date()
 
-            room = next((r for r in hotel.rooms if r.room_number == room_number), None)
-            if room:
-                print(booking_system.book_room(room, date))
+            szoba = next((r for r in hotel.szobak if r.szoba_szam == szoba_szam), None)
+            if szoba:
+                print(foglalas_rendszer.szoba_foglalas(szoba, datum))
             else:
                 print("A szoba nem található")
 
-        elif choice == 2:
-            room_number = int(input("Írja a be a szoba sorszámát: "))
-            date = input("Írja be a foglalás időpontját (YYYY-MM-DD): ")
-            date = datetime.strptime(date, "%Y-%m-%d").date()
+        elif m == 2:
+            szoba_szam = int(input("Írja a be a szoba sorszámát: "))
+            datum = input("Írja be a foglalás időpontját (YYYY-MM-DD): ")
+            datum = datetime.strptime(datum, "%Y-%m-%d").date()
 
-            room = next((r for r in hotel.rooms if r.room_number == room_number), None)
-            if room:
-                print(booking_system.cancel_booking(room, date))
+            szoba = next((r for r in hotel.szobak if r.szoba_szam == szoba_szam), None)
+            if szoba:
+                print(foglalas_rendszer.szoba_torles(szoba, datum))
             else:
                 print("A szoba nem található")
 
-        elif choice == 3:
-            for room in hotel.rooms:
-                print(f"Szoba {room.room_number}: {room.room_type()} - Ár: {room.price}")
+        elif m == 3:
+            for szoba in hotel.szobak:
+                print(f"Szoba {szoba.szoba_szam}: {szoba.szoba_type()} - Ár: {szoba.ar}")
 
-        elif choice == 4:
-            bookings = booking_system.list_bookings()
-            for date, rooms in bookings.items():
-                print(f"Időpont: {date}")
-                for room in rooms:
-                    print(f"  Szoba {room.room_number} ({room.room_type()})")
+        elif m == 4:
+            foglalasok = foglalas_rendszer.lista_foglalasok()
+            for datum, szobak in foglalasok.items():
+                print(f"Időpont: {datum}")
+                for szoba in szobak:
+                    print(f"  Szoba {szoba.szoba_szam} ({szoba.szoba_type()})")
 
-        elif choice == 5:
+        elif m == 5:
             break
 
         else:
